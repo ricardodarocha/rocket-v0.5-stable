@@ -14,6 +14,7 @@ pub struct FormMaterial<'r> {
 #[derive(Serialize, Deserialize, FromRow)]
 #[serde(crate = "rocket::serde")]
 pub struct Material {
+    id: i32,
     name: String,
     price: f32,
 }
