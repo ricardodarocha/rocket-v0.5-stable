@@ -14,14 +14,13 @@ pub struct FormMaterial<'r> {
 #[derive(Serialize, Deserialize, FromRow)]
 #[serde(crate = "rocket::serde")]
 pub struct Material {
-    id: i32,
     name: String,
     price: f32,
 }
 
 #[post("/mate/json", format = "json", data = "<material>")]
 pub async fn newmate(mut db: Connection<DbMeuBanco>, material: Json<Material>)  -> Result<Json<Material>, status::Custom<String>> {
-    sqlx::query_as::<_, Material>("INSERT INTO PRODUTO (name, price, tipo) values (?/*name*/, ?/*price*/, 'material') returning id, name, price, tipo")
+    sqlx::query_as::<_, Material>("INSERT INTO products (name, price, tipo) values (?/*name*/, ?/*price*/, 'material') returning id, name, price, tipo")
         .bind(&material.name)
         .bind(material.price)
         .fetch_one(&mut **db)
@@ -32,7 +31,7 @@ pub async fn newmate(mut db: Connection<DbMeuBanco>, material: Json<Material>)  
 
 #[post("/mate", data = "<material>")]
 pub async fn form_mate(mut db: Connection<DbMeuBanco>, material: Form<FormMaterial<'_>> ) -> Result<Json<Material>, status::Custom<String>> {
-    sqlx::query_as::<_, Material>("INSERT INTO PRODUTO (name, price, tipo) values (?/*name*/, ?/*price*/, 'material') returning id, name, price, tipo")
+    sqlx::query_as::<_, Material>("INSERT INTO products (name, price, tipo) values (?/*name*/, ?/*price*/, 'material') returning id, name, price, tipo")
         .bind(material.name)
         .bind(material.price)
         .fetch_one(&mut **db)

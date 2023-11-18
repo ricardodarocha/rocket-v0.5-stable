@@ -19,7 +19,7 @@ pub struct Product {
 
 #[post("/prod/json", format = "json", data = "<product>")]
 pub async fn newprod(mut db: Connection<DbMeuBanco>, product: Json<Product>) -> Result<Json<Product>, status::Custom<String>> {
-    sqlx::query_as::<_, Product>("INSERT INTO PRODUTO (name, price, tipo) values (?/*name*/, ?/*price*/, 'produto') returning id, name, price, tipo")
+    sqlx::query_as::<_, Product>("INSERT INTO products (name, price, tipo) values (?/*name*/, ?/*price*/, 'produto') returning id, name, price, tipo")
         .bind(&product.name)
         .bind(product.price)
         .fetch_one(&mut **db)
@@ -30,7 +30,7 @@ pub async fn newprod(mut db: Connection<DbMeuBanco>, product: Json<Product>) -> 
 
 #[post("/prod", data = "<produto>")]
 pub async fn form_prod(mut db: Connection<DbMeuBanco>, produto: Form<FormProduct<'_>> ) -> Result<Json<Product>, status::Custom<String>> {
-    sqlx::query_as::<_, Product>("INSERT INTO PRODUTO (name, price, tipo) values (?/*name*/, ?/*price*/, 'produto') returning *")
+    sqlx::query_as::<_, Product>("INSERT INTO products (name, price, tipo) values (?/*name*/, ?/*price*/, 'produto') returning *")
         .bind(produto.name)
         .bind(produto.price)
         .fetch_one(&mut **db)
