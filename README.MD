@@ -1,7 +1,10 @@
-# Criando uma api com Rocket e Chat GPT3
+# Lançada a versão Rocket 0.5 stable
 
-Neste tutorial vamos criar uma api de produtos usando a biblioteca Rocket v0.5 que acaba de ser lançada pela comunidade Rust 🦀.
-Aqui está um exemplo básico de um aplicativo Rust Rocket v0.5. Este trecho criará um servidor web simples com uma rota /hello que responde com o texto "Hello, world!" quando acessado
+Se você quiser construir por si mesmo esta api com a ajuda do ChatGpt-4 aqui vai um exemplo inicial,
+porém eu recomendo que você clone este repositório e mude apenas as rotas porque pode haver uma dificuldade para configurar o Postres ou Sqlite no início
+Veja o arquivo rocket.toml e o módulo db.rs
+
+*Pegue um atalho, clone este repositorio e altere o banco de dados e as rotas*
 
 ```rust
 #[macro_use] extern crate rocket;
@@ -14,6 +17,81 @@ fn hello() -> &'static str {
 #[launch]
 fn rocket() -> _ {
     rocket::build().mount("/", routes![hello])
+}
+```
+
+Exemplo do setup ao término do projeto
+
+```rust
+pub mod reg;
+pub mod auth;
+#[macro_use] extern crate rocket;
+
+pub mod mate;
+pub mod prod;
+pub mod db;
+
+use mate::*;
+use prod::*;
+
+#[get("/hello")]
+fn hello() -> &'static str {
+    "Hello, world!"
+}
+
+// use rocket::serde::{Serialize, Deserialize, json::{Json, Value}};
+use rocket_db_pools::Database;
+use crate::db::DbMeuBanco;
+
+#[rocket::main]
+async fn main() {
+    let _ = rocket::build()
+        .attach(db::DbMeuBanco::init())
+        .mount("/", routes![ 
+            hello,  
+            //seus módulos
+            suas_rotas_aqui,
+            ]
+    
+    )
+        .launch()
+        .await;
+}
+
+
+```
+
+## Configuração do banco de dados
+
+ver migrations, db.rs e rocket.toml
+
+```rust
+// src/db/mod.rs
+use sqlx::{SqlitePool, Pool, Sqlite};
+use rocket_db_pools::{sqlx, Database};
+
+#[derive(Database)]
+#[database("sqlite_meu_banco")]
+pub struct DbMeuBanco(sqlx::SqlitePool);
+use rocket::fairing::AdHoc;
+
+pub async fn init_db_pool(database_url: &str) -> Result<Pool<Sqlite>, sqlx::Error> {
+    SqlitePool::connect(database_url).await
+}
+```
+
+Observar como o banco de dados deve ser passado nas rotas assíncronas
+
+```rust
+#[post("/prod/json", format = "json", data = "<product>")]
+pub async fn newprod(mut db: Connection<DbMeuBanco>, product: Json<Product>) -> Result<Json<Product>, status::Custom<String>> {
+    sqlx::query_as::<_, Product>("INSERT INTO PRODUTO (name, price, tipo) values (?/*name*/, ?/*price*/, 'produto') returning id, name, price, tipo")
+        .bind(&product.name)
+        .bind(product.price)
+        .fetch_one(&mut **db)
+        .await
+        .map(Json)
+        .map_err(|e| status::Custom(Status::InternalServerError, e.to_string()))
 }
 ```
 
