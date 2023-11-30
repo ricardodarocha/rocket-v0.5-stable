@@ -63,6 +63,19 @@ async fn main() {
 
 ## Configuração do banco de dados
 
+Para criar o banco de dados instale o cli do sqlx e rode
+
+```
+cargo install sqlx-cli
+# apenas se for postgres
+cargo install sqlx-cli --no-default-features --features native-tls,postgres
+
+# Cria um arquivo .db contendo o banco de dados sqlite
+cargo sqlx database create
+
+# Roda as migrations
+cargo sqlx migrate run
+```
 ver migrations, db.rs e rocket.toml
 
 ```rust
