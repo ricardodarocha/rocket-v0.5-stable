@@ -1,7 +1,7 @@
 # Lançada a versão Rocket 0.5 stable
 
 Se você quiser construir por si mesmo esta api com a ajuda do ChatGpt-4 aqui vai um exemplo inicial,
-porém eu recomendo que você clone este repositório e mude apenas as rotas porque pode haver uma dificuldade para configurar o Postres ou Sqlite no início
+porém eu recomendo que você clone este repositório e mude apenas as rotas porque pode haver uma dificuldade para configurar o Postgres ou Sqlite no início
 Veja o arquivo rocket.toml e o módulo db.rs
 
 *Pegue um atalho, clone este repositorio e altere o banco de dados e as rotas*
